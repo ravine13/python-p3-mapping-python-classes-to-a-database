@@ -1,6 +1,8 @@
 from config import CONN, CURSOR
 
 class Song:
+    all = []
+
     def __init__(self, name, album):
         self.id = None
         self.name = name
@@ -37,3 +39,18 @@ class Song:
         CURSOR.execute(sql, (self.name, self.album))
         CONN.commit()
         self.id = CURSOR.lastrowid
+
+    @classmethod
+    def new_from_db(cls,row):
+        song = cls(row[1],row[2])
+        song.id = row[0]
+
+    @classmethod
+    def all(cls):
+        sql = """
+            SELECT *
+            FROM songs
+        """
+
+        all = CURSOR.execute(sql).fetchall()
+        cls.all = [cls.new_from_db(row) for row in all]
